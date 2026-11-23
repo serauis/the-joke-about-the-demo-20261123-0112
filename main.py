@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
-"""Write one joke about working beside an AI coding agent.
+"""One joke about working beside an AI coding agent.
 
-Deterministic, offline, stdlib only. Writes exactly one line to
-/output/entry.txt.
+Writes exactly one line of text to ``/output/entry.txt`` (or to
+``$OUTPUT_DIR/entry.txt`` when that variable is set, for local testing).
+
+The joke is a fixed constant: no network, no randomness, no external
+input, standard library only, so every run produces byte-identical output.
+The em dash in the punchline is written as the ``\u2014`` escape so the
+source stays plain ASCII while the output carries the real character.
 """
 
 import os
@@ -15,10 +20,20 @@ JOKE = (
 )
 
 
+def write_entry(output_dir: Path) -> Path:
+    """Write the joke line to ``entry.txt`` inside ``output_dir``.
+
+    Returns the path of the file written.
+    """
+    output_dir.mkdir(parents=True, exist_ok=True)
+    entry_path = output_dir / "entry.txt"
+    entry_path.write_text(JOKE + "\n", encoding="utf-8")
+    return entry_path
+
+
 def main() -> None:
     output_dir = Path(os.environ.get("OUTPUT_DIR", "/output"))
-    output_dir.mkdir(parents=True, exist_ok=True)
-    (output_dir / "entry.txt").write_text(JOKE + "\n", encoding="utf-8")
+    write_entry(output_dir)
 
 
 if __name__ == "__main__":
